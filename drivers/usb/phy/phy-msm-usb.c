@@ -2771,6 +2771,7 @@ do_wait:
 static void msm_otg_sm_work(struct work_struct *w)
 {
 	struct msm_otg *motg = container_of(w, struct msm_otg, sm_work);
+	struct msm_otg_platform_data *pdata = motg->pdata;
 	struct usb_otg *otg = motg->phy.otg;
 	struct device *dev = otg->phy->dev;
 	bool work = 0, dcp;
@@ -2842,8 +2843,13 @@ static void msm_otg_sm_work(struct work_struct *w)
 				case USB_DCP_CHARGER:
 					/* fall through */
 				case USB_PROPRIETARY_CHARGER:
-					msm_otg_notify_charger(motg,
+					if (pdata->dcp_charger_current)
+						msm_otg_notify_charger(motg,
+						pdata->dcp_charger_current);
+					else
+						msm_otg_notify_charger(motg,
 							dcp_max_current);
+
 					if (!motg->is_ext_chg_dcp)
 						otg->phy->state =
 							OTG_STATE_B_CHARGER;
@@ -2864,6 +2870,9 @@ static void msm_otg_sm_work(struct work_struct *w)
 						OTG_STATE_B_PERIPHERAL;
 					mod_timer(&motg->chg_check_timer,
 							CHG_RECHECK_DELAY);
+					if (pdata->dcp_charger_current)
+						msm_otg_notify_charger(motg,
+						pdata->dcp_charger_current);
 					break;
 				default:
 					break;
@@ -4338,6 +4347,9 @@ struct msm_otg_platform_data *msm_otg_dt_to_pdata(struct platform_device *pdev)
 					"qcom,enable-sdp-typec-current-limit");
 	pdata->vbus_low_as_hostmode = of_property_read_bool(node,
 					"qcom,vbus-low-as-hostmode");
+
+	of_property_read_u32(node, "qcom,xp3-dcp-current-limit",
+			&pdata->dcp_charger_current);
 	return pdata;
 }
 
