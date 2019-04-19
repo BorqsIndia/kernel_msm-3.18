@@ -871,4 +871,20 @@ config SND_SOC_MSM_HDMI_CODEC_RX
 config SND_SOC_MSM_HDMI_DBA_CODEC_RX
 	bool "HDMI DBA Audio Playback"
 	depends on MSM_DBA
+
+config SND_SOC_TFA98XX
+        tristate "NXP TFA98XX smart amplifier"
+        depends on I2C
+
+config SND_SOC_FS16XX
+        bool "FourSemi fs16xx Codec Driver"
+        depends on I2C
+        default y
+        help
+          for FourSemi True Smart Amplifier.
+
+config SND_SOC_SMARTPA
+         tristate "smart pa amplifier"
+         depends on I2C
+
 endmenu

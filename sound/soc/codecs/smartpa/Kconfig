@@ -1,0 +1,5 @@
+config SND_SOC_SMARTPA
+        tristate "smart pa amplifier"
+        depends on I2C
+
+
